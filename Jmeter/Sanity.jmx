@@ -68,7 +68,7 @@
         <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
       </CookieManager>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
         <intProp name="ThreadGroup.num_threads">2</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -1482,7 +1482,8 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/home/rohan/Public/Projects/JenkinsProject/Jpetstore/sanity_test_4jan.xml</stringProp>
+        <stringProp name="filename"></stringProp>
+        <stringProp name="TestPlan.comments">/home/rohan/Public/Projects/JenkinsProject/Jpetstore/sanity_test_4jan.xml</stringProp>
       </ResultCollector>
       <hashTree/>
       <ProxyControl guiclass="ProxyControlGui" testclass="ProxyControl" testname="HTTP(S) Test Script Recorder" enabled="false">
