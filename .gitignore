@@ -1,0 +1,9 @@
+# JMeter results
+Results/
+*.jtl
+*.log
+
+# OS / Editor files
+.DS_Store
+.idea/
+.vscode/
