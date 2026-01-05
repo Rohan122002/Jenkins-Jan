@@ -42,9 +42,12 @@ pipeline {
         sh """
         ssh -o StrictHostKeyChecking=no \
         -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
+            # Clean previous results
+            rm -f ${REMOTE_DIR}/results/sanity.jtl
             rm -rf ${REMOTE_DIR}/results/sanity/report
             mkdir -p ${REMOTE_DIR}/results/sanity/report
 
+            # Run JMeter sanity
             ${JMETER} -n \
             -t ${REMOTE_DIR}/performance-ci/Jmeter/Sanity.jmx \
             -l ${REMOTE_DIR}/results/sanity.jtl \
@@ -53,6 +56,7 @@ pipeline {
         """
     }
 }
+
 
 
         stage('Validate Sanity') {
