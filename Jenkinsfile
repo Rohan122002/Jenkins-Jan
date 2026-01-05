@@ -68,7 +68,7 @@ pipeline {
                     echo "❌ Sanity test failed"
                     exit 1
                 else
-                    echo "✅ Sanity test passed"
+                    echo "✅ Sanity test passed1111"
                 fi
                 '
                 """
