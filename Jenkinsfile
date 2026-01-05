@@ -25,7 +25,7 @@ pipeline {
                 -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
                     rm -rf ${REMOTE_DIR}/performance-ci
                     mkdir -p ${REMOTE_DIR}/performance-ci
-                    mkdir -p ${REMOTE_DIR}/results/sanity/report
+                    mkdir -p ${REMOTE_DIR}/results/{sanity,load}/report
                 '
                 """
 
@@ -37,39 +37,73 @@ pipeline {
             }
         }
 
+        /* ================= SANITY ================= */
+
         stage('Sanity Test') {
-    steps {
-        sh """
-        ssh -o StrictHostKeyChecking=no \
-        -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
-            # Clean previous results
-            rm -f ${REMOTE_DIR}/results/sanity.jtl
-            rm -rf ${REMOTE_DIR}/results/sanity/report
-            mkdir -p ${REMOTE_DIR}/results/sanity/report
+            steps {
+                sh """
+                ssh -o StrictHostKeyChecking=no \
+                -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
+                    rm -f ${REMOTE_DIR}/results/sanity.jtl
+                    rm -rf ${REMOTE_DIR}/results/sanity/report
+                    mkdir -p ${REMOTE_DIR}/results/sanity/report
 
-            # Run JMeter sanity
-            ${JMETER} -n \
-            -t ${REMOTE_DIR}/performance-ci/Jmeter/Sanity.jmx \
-            -l ${REMOTE_DIR}/results/sanity.jtl \
-            -e -o ${REMOTE_DIR}/results/sanity/report
-        '
-        """
-    }
-}
-
-
+                    ${JMETER} -n \
+                    -t ${REMOTE_DIR}/performance-ci/Jmeter/Sanity.jmx \
+                    -l ${REMOTE_DIR}/results/sanity.jtl \
+                    -e -o ${REMOTE_DIR}/results/sanity/report
+                '
+                """
+            }
+        }
 
         stage('Validate Sanity') {
             steps {
                 sh """
                 ssh -o StrictHostKeyChecking=no \
                 -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
-                if grep -q ",false," ${REMOTE_DIR}/results/sanity.jtl; then
-                    echo "❌ Sanity test failed"
-                    exit 1
-                else
-                    echo "✅ Sanity test passed1111"
-                fi
+                    if grep -q ",false," ${REMOTE_DIR}/results/sanity.jtl; then
+                        echo "❌ Sanity test failed"
+                        exit 1
+                    else
+                        echo "✅ Sanity test passed"
+                    fi
+                '
+                """
+            }
+        }
+
+        /* ================= LOAD ================= */
+
+        stage('Load Test') {
+            steps {
+                sh """
+                ssh -o StrictHostKeyChecking=no \
+                -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
+                    rm -f ${REMOTE_DIR}/results/load.jtl
+                    rm -rf ${REMOTE_DIR}/results/load/report
+                    mkdir -p ${REMOTE_DIR}/results/load/report
+
+                    ${JMETER} -n \
+                    -t ${REMOTE_DIR}/performance-ci/Jmeter/Load_test.jmx \
+                    -l ${REMOTE_DIR}/results/load.jtl \
+                    -e -o ${REMOTE_DIR}/results/load/report
+                '
+                """
+            }
+        }
+
+        stage('Validate Load') {
+            steps {
+                sh """
+                ssh -o StrictHostKeyChecking=no \
+                -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
+                    if grep -q ",false," ${REMOTE_DIR}/results/load.jtl; then
+                        echo "❌ Load test failed"
+                        exit 1
+                    else
+                        echo "✅ Load test passed"
+                    fi
                 '
                 """
             }
@@ -78,13 +112,13 @@ pipeline {
 
     post {
         success {
-            echo "✅ Sanity pipeline completed successfully"
+            echo "✅ Sanity + Load pipeline completed successfully"
         }
         failure {
-            echo "❌ Sanity pipeline failed"
+            echo "❌ Pipeline failed due to performance issues"
         }
         always {
-            echo "🏁 Sanity execution completed"
+            echo "🏁 Performance execution completed"
         }
     }
 }
