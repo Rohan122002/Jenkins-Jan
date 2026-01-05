@@ -38,18 +38,22 @@ pipeline {
         }
 
         stage('Sanity Test') {
-            steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no \
-                -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
-                ${JMETER} -n \
-                -t ${REMOTE_DIR}/performance-ci/Jmeter/Sanity.jmx \
-                -l ${REMOTE_DIR}/results/sanity.jtl \
-                -e -o ${REMOTE_DIR}/results/sanity/report
-                '
-                """
-            }
-        }
+    steps {
+        sh """
+        ssh -o StrictHostKeyChecking=no \
+        -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} '
+            rm -rf ${REMOTE_DIR}/results/sanity/report
+            mkdir -p ${REMOTE_DIR}/results/sanity/report
+
+            ${JMETER} -n \
+            -t ${REMOTE_DIR}/performance-ci/Jmeter/Sanity.jmx \
+            -l ${REMOTE_DIR}/results/sanity.jtl \
+            -e -o ${REMOTE_DIR}/results/sanity/report
+        '
+        """
+    }
+}
+
 
         stage('Validate Sanity') {
             steps {
