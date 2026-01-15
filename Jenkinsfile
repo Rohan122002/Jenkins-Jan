@@ -5,7 +5,7 @@ pipeline {
         EC2_USER   = "ec2-user"
         EC2_IP     = "34.224.25.248"
         SSH_KEY    = "/var/lib/jenkins/.ssh/performance-ci-new.pem"
-        JMETER     = "/opt/jmeter/bin/jmeter"
+        JMETER     = "/opt/apache-jmeter-5.6.3/bin/jmeter"
         REMOTE_DIR = "/home/ec2-user/jmeter-tests"
     }
 
